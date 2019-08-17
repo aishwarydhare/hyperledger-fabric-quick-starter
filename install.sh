@@ -26,13 +26,10 @@ make gotools
 make peer orderer peer-docker orderer-docker
 curl -sSL http://bit.ly/2ysbOFE > bootstrap.sh
 chmod +x bootstrap.sh
-sudo ./bootstrap.sh
-sudo ./bootstrap.sh -ds
+./bootstrap.sh
+./bootstrap.sh -ds
 cd bin
 NEW_PATH=$(pwd):$PATH
 export PATH=NEW_PATH
 echo "export PATH=$PATH" >> ~/.profile
-mkdir -p /opt/gopath/src/github.com/hyperledger/fabric/build
-cp -r ~/bin /opt/gopath/src/github.com/hyperledger/fabric/build/
-echo "export FABRIC_CFG_PATH=/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig" >> ~/.profile
 EOF
