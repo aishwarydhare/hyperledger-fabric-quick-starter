@@ -1,0 +1,44 @@
+// manually
+echo "deb https://apache.bintray.com/couchdb-deb xenial main"     | sudo tee -a /etc/apt/sources.list
+curl -L https://couchdb.apache.org/repo/bintray-pubkey.asc     | sudo apt-key add -
+sudo apt-get update && sudo apt-get install couchdb
+service couchdb start
+
+
+sudo docker run --env COUCHDB_USER= --env COUCHDB_PASSWORD= -p5984:5984 --name couchdb hyperledger/fabric-couchdb
+
+export FABRIC_CFG_PATH=
+./configtxgen -profile Channels -outputCreateChannelTx custom.tx -channelID custom
+
+ORDERER_TLS="--tls true --cafile `pwd`/crypto-config/ordererOrganizations/hrl.ibm.il/orderers/172.31.58.159.hrl.ibm.il/tls/ca.crt"
+CORE_PEER_MSPCONFIGPATH=`pwd`/crypto-config/peerOrganizations/hrl.ibm.il/users/Admin@hrl.ibm.il/msp \
+CORE_PEER_LOCALMSPID=PeerOrg \
+./peer channel create -f custom.tx -c custom -o 172.31.58.159:7050 ${ORDERER_TLS}
+
+CORE_PEER_LOCALMSPID=PeerOrg \
+CORE_PEER_MSPCONFIGPATH=`pwd`/crypto-config/peerOrganizations/hrl.ibm.il/users/Admin@hrl.ibm.il/msp/ \
+CORE_PEER_ADDRESS=172.31.62.25:7051 \
+./peer channel join -b custom.block
+
+CC_SRC_PATH=github.com/hyperledger/fabric/examples/chaincode/go/example02/cmd
+CORE_PEER_LOCALMSPID=PeerOrg \
+CORE_PEER_MSPCONFIGPATH=`pwd`/crypto-config/peerOrganizations/hrl.ibm.il/users/Admin@hrl.ibm.il/msp/ \
+CORE_PEER_ADDRESS=172.31.62.25:7051 \
+./peer chaincode install -p ${CC_SRC_PATH} -n exampleCC -v 1.2
+
+CORE_PEER_LOCALMSPID=PeerOrg \
+CORE_PEER_MSPCONFIGPATH=`pwd`/crypto-config/peerOrganizations/hrl.ibm.il/users/Admin@hrl.ibm.il/msp/ \
+CORE_PEER_ADDRESS=172.31.62.25:7051 \
+./peer chaincode list --installed 
+
+ORDERER_TLS="--tls true --cafile `pwd`/crypto-config/ordererOrganizations/hrl.ibm.il/orderers/172.31.58.159.hrl.ibm.il/tls/ca.crt"
+CORE_PEER_TLS_ROOTCERT_FILE=`pwd`/crypto-config/peerOrganizations/hrl.ibm.il/peers/${bootPeer}.hrl.ibm.il/tls/ca.crt \
+CORE_PEER_LOCALMSPID=PeerOrg \
+CORE_PEER_MSPCONFIGPATH=`pwd`/crypto-config/peerOrganizations/hrl.ibm.il/users/Admin@hrl.ibm.il/msp/ \
+CORE_PEER_ADDRESS=172.31.62.25:7051 \
+./peer chaincode instantiate -n exampleCC -v 1.2 -C custom -c '{"Args":["init","a","100","b","200"]}' -o 172.31.58.159:7050 ${ORDERER_TLS}
+
+CORE_PEER_LOCALMSPID=PeerOrg \
+CORE_PEER_MSPCONFIGPATH=`pwd`/crypto-config/peerOrganizations/hrl.ibm.il/users/Admin@hrl.ibm.il/msp/ \
+CORE_PEER_ADDRESS=172.31.62.25:7051 \
+./peer chaincode instantiate -n exampleCC -v 1.45 -C custom -l golang -c '{"Args":["init","a","100","b","200"]}' -o 172.31.58.159:7050 -P "OR('Org1MSP.member')"

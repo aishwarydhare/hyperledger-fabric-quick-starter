@@ -1,7 +1,7 @@
 # Copyright IBM Corp. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
-# HLF version 1.2
+#
 
 ###############################################################################
 #
@@ -60,7 +60,7 @@ logging:
 peer:
 
     # The Peer id is used for identifying this Peer instance.
-    id: PEERID
+    id: jdoe
 
     # The networkId allows for logical seperation of networks
     networkId: dev
@@ -84,7 +84,7 @@ peer:
     # in the same organization. For peers in other organization, see
     # gossip.externalEndpoint for more info.
     # When used as CLI config, this means the peer's endpoint to interact with
-    address: ADDRESS:7051
+    address: 0.0.0.0:7051
 
     # Whether the Peer should programmatically determine its address
     # This case is useful for docker containers.
@@ -128,7 +128,7 @@ peer:
         # Important: The endpoints here have to be endpoints of peers in the same
         # organization, because the peer would refuse connecting to these endpoints
         # unless they are in the same organization as the peer.
-        bootstrap: BOOTSTRAP
+        bootstrap: 127.0.0.1:7051
 
         # NOTE: orgLeader and useLeaderElection parameters are mutual exclusive.
         # Setting both to true would result in the termination of the peer
@@ -141,12 +141,12 @@ peer:
         # connection with ordering service and use delivery protocol
         # to pull ledger blocks from ordering service. It is recommended to
         # use leader election for large networks of peers.
-        useLeaderElection: false
+        useLeaderElection: true
         # Statically defines peer to be an organization "leader",
         # where this means that current peer will maintain connection
         # with ordering service and disseminate block across peers in
         # its own organization
-        orgLeader: ORGLEADER
+        orgLeader: false
 
         # Overrides the endpoint that the peer publishes to peers
         # in its organization. For peers in foreign organizations
@@ -161,7 +161,7 @@ peer:
         # Number of times a message is pushed to remote peers
         propagateIterations: 1
         # Number of peers selected to push messages to
-        propagatePeerNum: PROPAGATEPEERNUM
+        propagatePeerNum: 3
         # Determines frequency of pull phases(unit: second)
         # Must be greater than digestWaitTime + responseWaitTime
         pullInterval: 4s
@@ -266,7 +266,7 @@ peer:
     # not mutual TLS auth. See comments on chaincodeListenAddress for more info
     tls:
         # Require server-side TLS
-        enabled: true
+        enabled:  false
         # Require client certificates / mutual TLS.
         # Note that clients that are not configured to use a certificate will
         # fail to connect to the peer.
@@ -281,10 +281,6 @@ peer:
         # Trusted root certificate chain for tls.cert
         rootcert:
             file: tls/ca.crt
-        
-        # The server name use to verify the hostname returned by TLS handshake
-        serverhostoverride:
-
         # Set of root certificate authorities used to verify client certificates
         clientRootCAs:
             files:
@@ -339,7 +335,7 @@ peer:
                 KeyStore:
 
     # Path on the file system where peer will find MSP local configurations
-    mspConfigPath: crypto
+    mspConfigPath: msp
 
     # Identifier of the local MSP
     # ----!!!!IMPORTANT!!!-!!!IMPORTANT!!!-!!!IMPORTANT!!!!----
@@ -348,7 +344,7 @@ peer:
     # to match the name of one of the MSPs in each of the channel
     # that this peer is a member of. Otherwise this peer's messages
     # will not be identified as valid by other nodes.
-    localMspId: PeerOrg
+    localMspId: SampleOrg
 
     # CLI common client config options
     client:
@@ -525,7 +521,7 @@ chaincode:
         name:
 
     # Generic builder environment, suitable for most chaincode types
-    builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
+    builder: $(DOCKER_NS)/fabric-ccenv:latest
 
     # Enables/disables force pulling of the base docker images (listed below)
     # during user chaincode instantiation.
@@ -550,7 +546,7 @@ chaincode:
         # This image is packed with shim layer libraries that are necessary
         # for Java chaincode runtime.
         Dockerfile:  |
-            from $(DOCKER_NS)/fabric-javaenv:$(ARCH)-$(PROJECT_VERSION)
+            from $(DOCKER_NS)/fabric-javaenv:$(ARCH)-1.1.0
     node:
         # need node.js engine at runtime, currently available in baseimage
         # but not in baseos
