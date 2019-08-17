@@ -1,35 +1,3 @@
----
-################################################################################
-#
-#   Profiles
-#
-#   - Different configuration profiles may be encoded here to be specified
-#   as parameters to the configtxgen tool.  The profiles which specify consortiums
-#   are to be used for generating the orderer genesis block.  With the correct
-#   consortium members defined in the orderer genesis block, channel creation
-#   requests may be generated with only the org member names and a consortium name
-#
-################################################################################
-Profiles:
-
-    # SampleSingleMSPSolo defines a configuration which uses the Solo orderer,
-    # and contains a single MSP definition (the MSP sampleconfig).
-    # The Consortium SampleConsortium has only a single member, SampleOrg
-    Genesis:
-        Orderer:
-            <<: *OrdererDefaults
-            Organizations:
-                - *OrdererOrg
-        Consortiums:
-             SampleConsortium:
-                Organizations:
-                - *PeerOrg
-    Channels:
-        Consortium: SampleConsortium
-        Application:
-            <<: *ApplicationDefaults
-            Organizations:
-                - *PeerOrg
 
 ################################################################################
 #
@@ -157,4 +125,37 @@ Application: &ApplicationDefaults
     # Organizations is the list of orgs which are defined as participants on
     # the application side of the network.
     Organizations:
+
+
+################################################################################
+#
+#   Profiles
+#
+#   - Different configuration profiles may be encoded here to be specified
+#   as parameters to the configtxgen tool.  The profiles which specify consortiums
+#   are to be used for generating the orderer genesis block.  With the correct
+#   consortium members defined in the orderer genesis block, channel creation
+#   requests may be generated with only the org member names and a consortium name
+#
+################################################################################
+Profiles:
+
+    # SampleSingleMSPSolo defines a configuration which uses the Solo orderer,
+    # and contains a single MSP definition (the MSP sampleconfig).
+    # The Consortium SampleConsortium has only a single member, SampleOrg
+    Genesis:
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+        Consortiums:
+             SampleConsortium:
+                Organizations:
+                - *PeerOrg
+    Channels:
+        Consortium: SampleConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *PeerOrg
 
