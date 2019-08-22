@@ -213,7 +213,9 @@ sleep 20
 
 echo "Creating channel"
 FABRIC_CFG_PATH=/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig
-CORE_PEER_MSPCONFIGPATH=`pwd`/crypto-config/peerOrganizations/hrl.ibm.il/users/Admin@hrl.ibm.il/msp CORE_PEER_LOCALMSPID=PeerOrg ./peer channel create ${ORDERER_TLS} -f yacov.tx  -c yacov -o ${orderer}:7050
+CORE_PEER_MSPCONFIGPATH=`pwd`/crypto-config/peerOrganizations/hrl.ibm.il/users/Admin@hrl.ibm.il/msp \
+CORE_PEER_LOCALMSPID=PeerOrg \
+./peer channel create ${ORDERER_TLS} -f yacov.tx  -c yacov -o ${orderer}:7050
 echo "CORE_PEER_MSPCONFIGPATH=$CORE_PEER_MSPCONFIGPATH"
 
 echo "Joining peers to channel"

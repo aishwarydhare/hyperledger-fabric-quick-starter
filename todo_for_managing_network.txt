@@ -1,0 +1,17 @@
+For adding/removing components of a network
+
+# components
+1. Organisation
+2. Peers
+3. Orderer
+4. Channel
+5. Chaincode
+6. MSP policies
+7. CA certificates
+
+
+1. Creating a Channel
+    1. Creating a profile for the channel
+    2. Creating a sign-able channel defination i.e. .tx file
+    3. Creating channel
+2. Peer joins Channel

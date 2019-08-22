@@ -1,0 +1,49 @@
+Organizations:
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererOrg
+        MSPDir: crypto-config/ordererOrganizations/hrl.ibm.il/msp
+        AdminPrincipal: Role.ADMIN
+    - &PeerOrg
+        Name: PeerOrg
+        ID: PeerOrg
+        MSPDir: crypto-config/peerOrganizations/hrl.ibm.il/msp
+        AdminPrincipal: Role.ADMIN
+        AnchorPeers:
+            - Host: ANCHOR_PEER_IP
+              Port: 7051
+
+Orderer: &OrdererDefaults
+    OrdererType: solo
+    Addresses:
+        - ORDERER_IP:7050
+    BatchTimeout: 1ms
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 99 MB
+        PreferredMaxBytes: 512 KB
+    MaxChannels: 0
+    Kafka:
+        Brokers:
+            - 127.0.0.1:9092
+    Organizations:
+
+Application: &ApplicationDefaults
+    Organizations:
+
+Profiles:
+    Genesis:
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+        Consortiums:
+             SampleConsortium:
+                Organizations:
+                - *PeerOrg
+    Channels:
+        Consortium: SampleConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *PeerOrg
