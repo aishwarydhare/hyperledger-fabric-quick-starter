@@ -14,14 +14,13 @@ FABRIC_CFG_PATH=/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig
 
 CORE_PEER_MSPCONFIGPATH=`pwd`/crypto-config/peerOrganizations/hrl.ibm.il/users/Admin@hrl.ibm.il/msp/
 PEER_MSPID=PeerOrg
-PEER_ADDRESS=$p:7051
 CHANNEL_BLOCK=yacov.block
 
 echo "Joining peers to channel"
 for p in $peers ; do
     CORE_PEER_LOCALMSPID=${PEER_MSPID} \
     CORE_PEER_MSPCONFIGPATH=${CORE_PEER_MSPCONFIGPATH} \
-    CORE_PEER_ADDRESS=${PEER_ADDRESS} \
+    CORE_PEER_ADDRESS=$p:7051 \
     ./peer channel join -b ${CHANNEL_BLOCK}
     echo "Peer $p joined: yacov channel"
 done
