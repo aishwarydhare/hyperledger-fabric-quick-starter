@@ -5,6 +5,7 @@
 . config.sh
 
 bootPeer=$(echo ${peers} | awk '{print $1}')
+FABRIC_CFG_PATH=/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig
 
 echo "Waiting for peers $peers to sync..."
 t1=`date +%s`

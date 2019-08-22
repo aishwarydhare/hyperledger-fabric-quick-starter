@@ -9,6 +9,22 @@ For adding/removing components of a network
 6. MSP policies
 7. CA certificates
 
+Breaking Down Deployment Procedure
+
+1. Checking dependencies are matched
+2. Cleanup previous configurations and setup fresh directories
+3. Prepare configurations
+4. Generate artifacts
+5. Upload artifacts and install peers and orderer on nodes
+6. Start orderer and peers
+7. Create Channel
+8. Join peers to channel
+9. Install chaincode on peers
+10. Instantiate chaincode on boot-peer(s)
+11. Query chaincode for test
+12. Invoke chaincode
+13. Sync
+14. Finish
 
 1. Creating a Channel
     1. Creating a profile for the channel

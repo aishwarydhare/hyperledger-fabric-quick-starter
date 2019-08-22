@@ -4,6 +4,8 @@
 
 . config.sh
 
+FABRIC_CFG_PATH=/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig
+
 echo -n "Installing chaincode on peers..."
 CC_SRC_PATH=github.com/hyperledger/fabric/examples/chaincode/go/example02/cmd
 for p in $peers ; do
