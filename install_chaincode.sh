@@ -5,6 +5,8 @@
 . config.sh
 
 FABRIC_CFG_PATH=/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig
+export CORE_PEER_TLS_ROOTCERT_FILE=`pwd`/crypto-config/peerOrganizations/${DOMAIN}/peers/${bootPeer}.${DOMAIN}/tls/ca.crt
+export CORE_PEER_TLS_ENABLED=true
 
 echo -n "Installing chaincode on peers..."
 DEFAULT_CC_SRC_PATH=github.com/hyperledger/fabric/examples/chaincode/go/example02/cmd
