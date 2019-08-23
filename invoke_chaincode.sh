@@ -1,5 +1,9 @@
 #!/bin/bash -e
 
+./common_checks.sh
+
+. config.sh
+
 FABRIC_CFG_PATH=/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig
 
 invoke() {
@@ -9,16 +13,10 @@ invoke() {
         ./peer chaincode invoke -c '{"Args":["invoke","a","b","10"]}' -C yacov -n exampleCC --tls true --cafile `pwd`/crypto-config/ordererOrganizations/hrl.ibm.il/orderers/${orderer}.hrl.ibm.il/tls/ca.crt
 }
 
-./common_checks.sh
-
-. config.sh
-
-bootPeer=$(echo ${peers} | awk '{print $1}')
-
 echo "Invoking chaincode..."
 for i in `seq 5`; do
-        echo "invoking on ${bootpeer} : ${i}"
-        invoke ${bootPeer}
+    echo "invoking on ${bootPeer} : ${i}"
+    invoke ${bootPeer}
 done
 
 echo "Chaincode invoke successful"

@@ -9,8 +9,6 @@ getIP() {
 . config.sh
 
 echo "Preparing configuration..."
-bootPeer=$(echo ${peers} | awk '{print $1}')
-PROPAGATEPEERNUM=${PROPAGATEPEERNUM:-3}
 
 echo "Preparing core.yaml for orderer and peer"
 i=0
@@ -23,7 +21,7 @@ for p in $orderer $peers ; do
                 orgLeader=true
         fi
         (( i += 1 ))
-        cat core.yaml.template | sed "s/PROPAGATEPEERNUM/${PROPAGATEPEERNUM}/ ; s/PEERID/$p/ ; s/ADDRESS/$p/ ; s/ORGLEADER/$orgLeader/ ; s/BOOTSTRAP/$bootPeer:7051/ ; s/TLS_CERT/$p.hrl.ibm.il-cert.pem/" > $p/sampleconfig/core.yaml
+        cat core.yaml.template | sed "s/PROPAGATEPEERNUM/${PROPAGATEPEERNUM}/ ; s/PEERID/$p/ ; s/ADDRESS/$p/ ; s/ORGLEADER/$orgLeader/ ; s/BOOTSTRAP/$bootPeer:7051/ ; s/TLS_CERT/$p.${DOMAIN}-cert.pem/" > $p/sampleconfig/core.yaml
 done
 
 echo "Preparing configtx.yaml"
@@ -53,6 +51,7 @@ cat << EOF >> crypto-config.yml
       # Hostname: {{.Prefix}}{{.Index}} # default
       # SANS:
       #   - "{{.Hostname}}.alt.{{.Domain}}"
+      
 
     # ---------------------------------------------------------------------------
     # "Users"

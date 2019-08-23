@@ -1,3 +1,5 @@
+#!/bin/bash -e
+
 ./common_checks.sh
 ./cleanup_and_setup.sh
 ./prepare_configurations.sh
