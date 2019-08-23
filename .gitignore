@@ -1,4 +1,6 @@
+.idea*
+.DS_Store*
+.DS*
+*.DS
+**/*tmp
 tmp*
-tmp/*
-tmp*/*
-.idea

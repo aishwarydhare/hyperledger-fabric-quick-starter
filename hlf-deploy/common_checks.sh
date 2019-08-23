@@ -1,13 +1,13 @@
 #!/bin/bash -e
 
 probeFabric() {
-        echo $(ssh $user@$1 "ls /opt/gopath/src/github.com/hyperledger/fabric/ &> /dev/null || echo 'not found'" | grep -q "not found")
-        ssh $user@$1 "ls /opt/gopath/src/github.com/hyperledger/fabric/ &> /dev/null || echo 'not found'" | grep -q "not found"
-        if [ $? -eq 0 ];then
-                echo "1"
-                return
-        fi
-        echo "0"
+    echo $(ssh $user@$1 "ls /opt/gopath/src/github.com/hyperledger/fabric/ &> /dev/null || echo 'not found'" | grep -q "not found")
+    ssh $user@$1 "ls /opt/gopath/src/github.com/hyperledger/fabric/ &> /dev/null || echo 'not found'" | grep -q "not found"
+    if [ $? -eq 0 ];then
+            echo "1"
+            return
+    fi
+    echo "0"
 }
 
 deployFabric() {

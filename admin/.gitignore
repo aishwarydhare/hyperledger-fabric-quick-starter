@@ -1,0 +1,11 @@
+.DS_STORE/*
+.DS*
+
+node_modules/*
+tmp/*
+temp
+tmp.txt
+package-lock.json
+.idea/
+
+# exceptions

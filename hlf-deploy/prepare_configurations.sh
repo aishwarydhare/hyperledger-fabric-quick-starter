@@ -4,7 +4,7 @@ getIP() {
         ssh $user@$1 "ip addr | grep 'inet .*global' | cut -f 6 -d ' ' | cut -f1 -d '/' | head -n 1"
 }
 
-./common_checks.sh
+common_checks.sh
 
 . config.sh
 
@@ -21,14 +21,14 @@ for p in $orderer $peers ; do
                 orgLeader=true
         fi
         (( i += 1 ))
-        cat core.yaml.template | sed "s/PROPAGATEPEERNUM/${PROPAGATEPEERNUM}/ ; s/PEERID/$p/ ; s/ADDRESS/$p/ ; s/ORGLEADER/$orgLeader/ ; s/BOOTSTRAP/$bootPeer:7051/ ; s/TLS_CERT/$p.${DOMAIN}-cert.pem/" > $p/sampleconfig/core.yaml
+        cat ../template/core.yaml.template | sed "s/PROPAGATEPEERNUM/${PROPAGATEPEERNUM}/ ; s/PEERID/$p/ ; s/ADDRESS/$p/ ; s/ORGLEADER/$orgLeader/ ; s/BOOTSTRAP/$bootPeer:7051/ ; s/TLS_CERT/$p.${DOMAIN}-cert.pem/" > $p/sampleconfig/core.yaml
 done
 
 echo "Preparing configtx.yaml"
-cat configtx.yaml.template | sed "s/ANCHOR_PEER_IP/anchorpeer/ ; s/ORDERER_IP/$orderer/" > configtx.yaml
+cat ../template/configtx.yaml.template | sed "s/ANCHOR_PEER_IP/anchorpeer/ ; s/ORDERER_IP/$orderer/" > configtx.yaml
 
 echo "Preparing crypto-config.yaml"
-cat crypto-config.yml.template | sed "s/ORDERER_IP/$orderer/" > crypto-config.yml
+cat ../template/crypto-config.yml.template | sed "s/ORDERER_IP/$orderer/" > crypto-config.yml
 for p in $peers ; do
     echo "        - Hostname: $p" >> crypto-config.yml
 done

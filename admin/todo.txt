@@ -1,0 +1,41 @@
+For adding/removing components of a network
+
+# components
+1. Organisation
+2. Peers
+3. Orderer
+4. Channel
+5. Chaincode
+6. MSP policies
+7. CA certificates
+
+Breaking Down Deployment Procedure
+
+1. Checking dependencies are matched
+2. Cleanup previous configurations and setup fresh directories
+3. Prepare configurations
+4. Generate artifacts
+5. Upload artifacts and install peers and orderer on nodes
+6. Start orderer and peers
+7. Create Channel
+8. Join peers to channel
+9. Install chaincode on peers
+10. Instantiate chaincode on boot-peer(s)
+11. Invoke chaincode
+12. Query chaincode on each peer to test
+13. Finish
+
+
+1. Creating a Channel
+    1. Creating a profile for the channel
+    2. Creating a sign-able channel definition i.e. .tx file
+    3. Creating channel
+2. Peer joins Channel
+
+
+
+Current Limitations Requirements:
+
+1. Public SSH key of Envirya admin node will have to be added in remote ndoe machines in its ~/.ssh/authorized_hosts file
+2. User needs to be same in all blockchain node machines eg. ubuntu
+3.

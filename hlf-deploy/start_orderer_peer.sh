@@ -6,7 +6,7 @@ probePeerOrOrderer() {
 	return 1
 }
 
-./common_checks.sh
+common_checks.sh
 
 . config.sh
 

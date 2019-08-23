@@ -7,6 +7,7 @@ rm go1.12.7.linux-amd64.tar.gz
 export PATH=$PATH:~/go/bin/
 export GOPATH=/opt/gopath
 export GOROOT=~/go
+
 cat << EOF >> ~/.profile
 export PATH=$PATH:~/go/bin/
 export GOPATH=/opt/gopath

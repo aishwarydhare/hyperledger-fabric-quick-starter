@@ -1,0 +1,70 @@
+{
+  "Organizations": [
+    {
+      "Name": "",
+      "ID": "",
+      "MSPDir": "",
+      "AdminPrincipal": "",
+      "Type": 0
+    },
+    {
+      "Name": "",
+      "ID": "",
+      "MSPDir": "",
+      "AdminPrincipal": "",
+      "Type": 1,
+      "AnchorPeers": {
+        "Host": "",
+        "Port": 7051
+      },
+      "CustomConfigs": {
+        "xyz": "abc"
+      }
+    }
+  ],
+  "OrdererDefaults": {
+    "OrdererType": "solo",
+    "Addresses": [
+      "ORDERER_IP:7050"
+    ],
+    "BatchTimeout": "1ms",
+    "BatchSize": {
+      "MaxMessageCount": "10",
+      "AbsoluteMaxBytes": "99 MB",
+      "PreferredMaxBytes": "512 KB"
+    },
+    "MaxChannels": 0,
+    "Kafka": {
+      "Brokers": [
+        "127.0.0.1:9092"
+      ]
+    },
+    "Organizations": []
+  },
+  "ApplicationDefaults": {
+    "Organizations": []
+  },
+  "Profiles": [
+    {
+      "Name": "Genesis",
+      "Orderer": {
+        "Organizations": []
+      },
+      "Consortiums": [
+        {
+          "Name": "SampleConsortium",
+          "Organizations": []
+        }
+      ],
+      "Type": 0
+    },
+    {
+      "Name": "Genesis",
+      "Consortium": "",
+      "Application": {
+        "Organizations": []
+      },
+      "Type": 1
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "Organisations": [
+    {
+      "Name": "",
+      "Domain": "",
+      "Specs": [
+        {
+          "Hostname": "",
+          "CommonName": ""
+        }
+      ],
+      "Type": 0
+    },
+    {
+      "Name": "",
+      "Domain": "",
+      "Specs": [
+        {
+          "Hostname": "",
+          "CommonName": ""
+        }
+      ],
+      "Users": {
+        "Count": 1
+      },
+      "Type": 0
+    }
+  ]
+}
