@@ -46,4 +46,3 @@ done
 echo "All peers are now in sync"
 
 exit 0
-
