@@ -1,6 +1,8 @@
 #!/bin/bash
 sudo apt-get update
 sudo apt install libtool libltdl-dev docker docker-compose curl nano lsof htop openssl build-essential -y
+sudo groupadd docker
+sudo usermod -aG docker $USER
 wget https://dl.google.com/go/go1.12.7.linux-amd64.tar.gz
 tar -xvf go1.12.7.linux-amd64.tar.gz
 rm go1.12.7.linux-amd64.tar.gz
@@ -27,7 +29,11 @@ make gotools
 make peer orderer peer-docker orderer-docker
 curl -sSL http://bit.ly/2ysbOFE > bootstrap.sh
 chmod +x bootstrap.sh
-./bootstrap.sh
+
+newgrp docker <<EONG
+./bootstrap.sh -bs
+EONG
+
 ./bootstrap.sh -ds
 cd bin
 NEW_PATH=$(pwd):$PATH
