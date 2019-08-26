@@ -204,9 +204,10 @@ async function sortArtifactsByNodes(data){
   return new Promise(async (resolve, reject) => {
     for (let i = 0; i < data.organisations.length; i++) {
       let domain = data.organisations[i].Domain;
+      let type = data.organisations[i].Type === 0 ? "orderer" : "peer";
       for (let j = 0; j < data.organisations[i].Hostname.length; j++) {
         let addr = data.organisations[i].Hostname[j];
-        let src = `../output/crypto-config/peerOrganizations/${domain}/peers/${addr}.${domain}/msp/*`;
+        let src = `../output/crypto-config/${type}Organizations/${domain}/peers/${addr}.${domain}/msp/*`;
         let dest = `../output/toDeploy/${addr}/sampleconfig/crypto/`;
         await shell.exec(`mkdir -p ${dest}`);
         await shell.cp("-R", src, dest);
@@ -256,7 +257,7 @@ async function createOrganisation(cryptoConfigData, configTxData) {
     }
   }
 
-  if(await sortArtifactsByNodes() === true){
+  if(await sortArtifactsByNodes(cryptoConfigData) === true){
     console.log("Successfully sorted artifacts by nodes");
   }
 
