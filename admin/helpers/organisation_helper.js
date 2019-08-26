@@ -211,11 +211,11 @@ async function createOrganisation(cryptoConfigData, configTxData) {
   });
   console.log("Generated configtx.yaml");
 
-  if(await shell.exec(`cd ../output && ./bin/cryptogen generate --config crypto-config.yml`).code === 0 ){
+  if(await shell.exec(`cd ../output && cryptogen generate --config crypto-config.yml`).code === 0 ){
     console.log("Successfully generated all certs using cryptogen");
   }
 
-  if(await shell.exec(`cd ../output && ./bin/configtxgen -profile Genesis -outputBlock genesis.block -channelID system`).code === 0 ){
+  if(await shell.exec(`cd ../output && configtxgen -profile Genesis -outputBlock genesis.block -channelID system`).code === 0 ){
     console.log("Successfully signed and created genesis block using configtxgen");
   }
 
@@ -223,7 +223,7 @@ async function createOrganisation(cryptoConfigData, configTxData) {
     let profileName = configTxData.Profiles[i].Name;
     for (let j = 0; j < configTxData.Profiles[i].ChannelNames.length; j++) {
       let channelName = configTxData.Profiles[i].ChannelNames[j];
-      if (await shell.exec(`cd ../output && ./bin/configtxgen -profile ${profileName} -outputBlock ${channelName}.block -channelID ${channelName}`).code === 0) {
+      if (await shell.exec(`cd ../output && configtxgen -profile ${profileName} -outputBlock ${channelName}.block -channelID ${channelName}`).code === 0) {
         console.log(`Successfully signed and created ${channelName} block using configtxgen`);
       }
     }
