@@ -5,7 +5,7 @@
       "Domain": "",
       "Specs": [
         {
-          "Hostname": "",
+          "Hostname": [],
           "CommonName": ""
         }
       ],
@@ -16,7 +16,7 @@
       "Domain": "",
       "Specs": [
         {
-          "Hostname": "",
+          "Hostname": [],
           "CommonName": ""
         }
       ],

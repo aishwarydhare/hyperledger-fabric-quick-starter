@@ -1,17 +1,31 @@
 {
   "Organizations": [
     {
-      "Name": "",
-      "ID": "",
-      "MSPDir": "",
-      "AdminPrincipal": "",
+      "Name": "OrdererOrg",
+      "ID": "OrdererOrg",
+      "MSPDir": "crypto-config/ordererOrganizations/com.org.orderer/msp",
+      "AdminPrincipal": "Role.ADMIN",
       "Type": 0
     },
     {
-      "Name": "",
-      "ID": "",
-      "MSPDir": "",
-      "AdminPrincipal": "",
+      "Name": "MyOrg1",
+      "ID": "MyOrg1",
+      "MSPDir": "crypto-config/peerOrganizations/com.myorg1/msp",
+      "AdminPrincipal": "Role.ADMIN",
+      "Type": 1,
+      "AnchorPeers": {
+        "Host": "",
+        "Port": 7051
+      },
+      "CustomConfigs": {
+        "xyz": "abc"
+      }
+    },
+    {
+      "Name": "MyOrg2",
+      "ID": "MyOrg2",
+      "MSPDir": "crypto-config/peerOrganizations/com.myorg2/msp",
+      "AdminPrincipal": "Role.ADMIN",
       "Type": 1,
       "AnchorPeers": {
         "Host": "",
@@ -22,10 +36,11 @@
       }
     }
   ],
+
   "OrdererDefaults": {
     "OrdererType": "solo",
     "Addresses": [
-      "ORDERER_IP:7050"
+      "172.31.50.238:7050"
     ],
     "BatchTimeout": "1ms",
     "BatchSize": {
@@ -41,30 +56,41 @@
     },
     "Organizations": []
   },
+
   "ApplicationDefaults": {
     "Organizations": []
   },
+
+  "GenesisProfile": {
+    "Name": "Genesis",
+    "OrdererOrganizations": [
+      "OrdererOrg"
+    ],
+    "Consortiums": [
+      {
+        "Name": "SampleConsortium",
+        "Organizations": [
+          "MyOrg1",
+          "MyOrg2"
+        ]
+      }
+    ],
+    "Type": 0
+  },
+
   "Profiles": [
     {
-      "Name": "Genesis",
-      "Orderer": {
-        "Organizations": []
-      },
-      "Consortiums": [
-        {
-          "Name": "SampleConsortium",
-          "Organizations": []
-        }
+      "Name": "Channels",
+      "Consortium": "SampleConsortium",
+      "ApplicationOrganizations": [
+        "MyOrg1",
+        "MyOrg2"
       ],
-      "Type": 0
-    },
-    {
-      "Name": "Genesis",
-      "Consortium": "",
-      "Application": {
-        "Organizations": []
-      },
-      "Type": 1
+      "Type": 1,
+      "ChannelNames": [
+        "myChannel1",
+        "myChannel2"
+      ]
     }
   ]
 }

@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 getIP() {
-        ssh $user@$1 "ip addr | grep 'inet .*global' | cut -f 6 -d ' ' | cut -f1 -d '/' | head -n 1"
+        ssh ${user}@$1 "ip addr | grep 'inet .*global' | cut -f 6 -d ' ' | cut -f1 -d '/' | head -n 1"
 }
 
 common_checks.sh
@@ -12,7 +12,7 @@ echo "Preparing configuration..."
 
 echo "Preparing core.yaml for orderer and peer"
 i=0
-for p in $orderer $peers ; do
+for p in ${orderer} ${peers} ; do
         ip=$(getIP $p)
         echo "${p}'s ip address is ${ip}"
         orgLeader=false
@@ -29,7 +29,7 @@ cat ../template/configtx.yaml.template | sed "s/ANCHOR_PEER_IP/anchorpeer/ ; s/O
 
 echo "Preparing crypto-config.yaml"
 cat ../template/crypto-config.yml.template | sed "s/ORDERER_IP/$orderer/" > crypto-config.yml
-for p in $peers ; do
+for p in ${peers} ; do
     echo "        - Hostname: $p" >> crypto-config.yml
 done
 cat << EOF >> crypto-config.yml

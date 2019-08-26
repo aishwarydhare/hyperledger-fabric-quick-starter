@@ -1,29 +1,35 @@
 {
-  "Organisations": [
+  "organisations": [
     {
-      "Name": "",
-      "Domain": "",
-      "Specs": [
-        {
-          "Hostname": "",
-          "CommonName": ""
-        }
+      "Name": "OrdererOrg",
+      "Domain": "com.org.orderer",
+      "Specs": [],
+      "Hostname": [
+        "172.31.50.238"
       ],
+      "Users": null,
       "Type": 0
     },
     {
-      "Name": "",
-      "Domain": "",
-      "Specs": [
-        {
-          "Hostname": "",
-          "CommonName": ""
-        }
+      "Name": "MyOrg1",
+      "Domain": "com.myorg1",
+      "Specs": [],
+      "Hostname": [
+        "172.31.63.182",
+        "172.31.61.162"
       ],
-      "Users": {
-        "Count": 1
-      },
-      "Type": 0
+      "Users": 1,
+      "Type": 1
+    },
+    {
+      "Name": "MyOrg2",
+      "Domain": "com.myorg2",
+      "Specs": [],
+      "Hostname": [
+        "172.31.60.250"
+      ],
+      "Users": 1,
+      "Type": 1
     }
   ]
 }

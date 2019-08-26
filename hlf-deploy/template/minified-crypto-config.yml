@@ -1,11 +1,16 @@
 OrdererOrgs:
   - Name: Org0
-    Domain: hrl.ibm.il
+    Domain: hrl.ibm.il1
     Specs:
       - Hostname: ORDERER_IP
 PeerOrgs:
   - Name: Org1
-    Domain: hrl.ibm.il
+    Domain: hrl.ibm.il2
+    Specs:
+    Users:
+      Count: 1
+  - Name: Org2
+    Domain: hrl.ibm.il3
     Specs:
     Users:
       Count: 1
