@@ -1,17 +1,7 @@
 var fs = require('fs');
 var shell = require('shelljs');
 
-let data = {
-  "username": "ubuntu",
-  "peers": [
-    "172.31.63.182",
-    "172.31.61.162",
-    "172.31.60.250"
-  ],
-  "orderer": [
-    "172.31.50.238"
-  ],
-};
+let data = require('../nodes');
 
 async function init_peers(data) {
   let user = data.username;

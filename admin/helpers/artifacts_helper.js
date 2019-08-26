@@ -200,6 +200,33 @@ async function generateConfigTxFile(data) {
   });
 }
 
+async function sortArtifactsByNodes(data){
+  return new Promise(async (resolve, reject) => {
+    for (let i = 0; i < data.organisations.length; i++) {
+      let domain = data.organisations[i].Domain;
+      for (let j = 0; j < data.organisations[i].Hostname.length; j++) {
+        let addr = data.organisations[i].Hostname[j];
+        let src = `../output/crypto-config/peerOrganizations/${domain}/peers/${addr}.${domain}/msp/*`;
+        let dest = `../output/toDeploy/${addr}/sampleconfig/crypto/`;
+        await shell.exec(`mkdir -p ${dest}`);
+        await shell.cp("-R", src, dest);
+      }
+      return resolve(true);
+    }
+  });
+}
+
+async function uploadOnRemote(remoteUser, remoteAddr, srcPath, remotePath){
+  return new Promise(async (resolve, reject) => {
+    if(await shell.exec(`scp -r ${srcPath} ${remoteUser}@${remoteAddr}:${remotePath}`).code === 0){
+      console.log(`Successfully pushed ${srcPath} on remote`);
+      return resolve();
+    } else {
+      return reject();
+    }
+  });
+}
+
 async function createOrganisation(cryptoConfigData, configTxData) {
   await generateCryptoConfigFile(cryptoConfigData).catch((e) => {
     throw e
@@ -223,11 +250,23 @@ async function createOrganisation(cryptoConfigData, configTxData) {
     let profileName = configTxData.Profiles[i].Name;
     for (let j = 0; j < configTxData.Profiles[i].ChannelNames.length; j++) {
       let channelName = configTxData.Profiles[i].ChannelNames[j];
-      if (await shell.exec(`cd ../output && configtxgen -profile ${profileName} -outputBlock ${channelName}.block -channelID ${channelName}`).code === 0) {
+      if (await shell.exec(`cd ../output && configtxgen -profile ${profileName} -outputCreateChannelTx ${channelName}.block -channelID ${channelName}`).code === 0) {
         console.log(`Successfully signed and created ${channelName} block using configtxgen`);
       }
     }
   }
+
+  if(await sortArtifactsByNodes() === true){
+    console.log("Successfully sorted artifacts by nodes");
+  }
+
+  return;
+
+  await uploadOnRemote('ubuntu',
+    '',
+    '',
+    '/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig/');
+
 }
 
 createOrganisation(cryptoConfigData, configTxData);
