@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-common_checks.sh
+./common_checks.sh
 
 . config.sh
 

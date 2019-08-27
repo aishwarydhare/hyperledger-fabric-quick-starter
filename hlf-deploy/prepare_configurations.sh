@@ -4,7 +4,7 @@ getIP() {
         ssh ${user}@$1 "ip addr | grep 'inet .*global' | cut -f 6 -d ' ' | cut -f1 -d '/' | head -n 1"
 }
 
-common_checks.sh
+./common_checks.sh
 
 . config.sh
 
