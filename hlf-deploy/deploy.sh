@@ -11,19 +11,20 @@ probePeerOrOrderer() {
 }
 
 probeFabric() {
-        echo $(ssh $user@$1 "ls /opt/gopath/src/github.com/hyperledger/fabric/ &> /dev/null || echo 'not found'" | grep -q "not found")
-        ssh $user@$1 "ls /opt/gopath/src/github.com/hyperledger/fabric/ &> /dev/null || echo 'not found'" | grep -q "not found"
-        if [ $? -eq 0 ];then
-                echo "1"
-                return
-        fi
-        echo "0"
+    ssh-keyscan -H $1 >> ~/.ssh/known_hosts
+    echo $(ssh $user@$1 "ls /opt/gopath/src/github.com/hyperledger/fabric/ &> /dev/null || echo 'not found'" | grep -q "not found")
+    ssh $user@$1 "ls /opt/gopath/src/github.com/hyperledger/fabric/ &> /dev/null || echo 'not found'" | grep -q "not found"
+    if [ $? -eq 0 ];then
+        echo "1"
+        return
+    fi
+    echo "0"
 }
 
 deployFabric() {
-        echo $(scp install.sh $user@$1:install.sh)
-        scp install.sh $user@$1:install.sh
-        ssh $user@$1 "bash install.sh"
+    echo $(scp install.sh $user@$1:install.sh)
+    scp install.sh $user@$1:install.sh
+    ssh $user@$1 "bash install.sh"
 }
 
 query() {
@@ -34,10 +35,10 @@ query() {
 }
 
 invoke() {
-        CORE_PEER_LOCALMSPID=PeerOrg \
-        CORE_PEER_MSPCONFIGPATH=`pwd`/crypto-config/peerOrganizations/hrl.ibm.il/users/Admin@hrl.ibm.il/msp/ \
-        CORE_PEER_ADDRESS=$1:7051 \
-        ./peer chaincode invoke -c '{"Args":["invoke","a","b","10"]}' -C yacov -n exampleCC --tls true --cafile `pwd`/crypto-config/ordererOrganizations/hrl.ibm.il/orderers/${orderer}.hrl.ibm.il/tls/ca.crt
+    CORE_PEER_LOCALMSPID=PeerOrg \
+    CORE_PEER_MSPCONFIGPATH=`pwd`/crypto-config/peerOrganizations/hrl.ibm.il/users/Admin@hrl.ibm.il/msp/ \
+    CORE_PEER_ADDRESS=$1:7051 \
+    ./peer chaincode invoke -c '{"Args":["invoke","a","b","10"]}' -C yacov -n exampleCC --tls true --cafile `pwd`/crypto-config/ordererOrganizations/hrl.ibm.il/orderers/${orderer}.hrl.ibm.il/tls/ca.crt
 }
 
 [[ -z $GOPATH ]] && (echo "Environment variable GOPATH isn't set!"; exit 1)
@@ -78,17 +79,17 @@ bootPeer=$(echo ${peers} | awk '{print $1}')
 PROPAGATEPEERNUM=${PROPAGATEPEERNUM:-3}
 i=0
 for p in $orderer $peers ; do
-        mkdir -p $p/sampleconfig/crypto
-        mkdir -p $p/sampleconfig/tls
-        ip=$(getIP $p)
-        echo "${p}'s ip address is ${ip}"
-        orgLeader=false
-        bootstrap=anchorPeer:7051
-        if [[ $i -eq 1 ]];then
-                orgLeader=true
-        fi
-        (( i += 1 ))
-        cat ./template/core.yaml.template | sed "s/PROPAGATEPEERNUM/${PROPAGATEPEERNUM}/ ; s/PEERID/$p/ ; s/ADDRESS/$p/ ; s/ORGLEADER/$orgLeader/ ; s/BOOTSTRAP/$bootPeer:7051/ ; s/TLS_CERT/$p.hrl.ibm.il-cert.pem/" > $p/sampleconfig/core.yaml
+    mkdir -p $p/sampleconfig/crypto
+    mkdir -p $p/sampleconfig/tls
+    ip=$(getIP $p)
+    echo "${p}'s ip address is ${ip}"
+    orgLeader=false
+    bootstrap=anchorPeer:7051
+    if [[ $i -eq 1 ]];then
+            orgLeader=true
+    fi
+    (( i += 1 ))
+    cat ./template/core.yaml.template | sed "s/PROPAGATEPEERNUM/${PROPAGATEPEERNUM}/ ; s/PEERID/$p/ ; s/ADDRESS/$p/ ; s/ORGLEADER/$orgLeader/ ; s/BOOTSTRAP/$bootPeer:7051/ ; s/TLS_CERT/$p.hrl.ibm.il-cert.pem/" > $p/sampleconfig/core.yaml
 done
 
 echo "orderer $orderer"
@@ -152,9 +153,9 @@ cp ./template/orderer.yaml $orderer/sampleconfig/
 cp -r crypto-config/ordererOrganizations/hrl.ibm.il/orderers/${orderer}.hrl.ibm.il/msp/* $orderer/sampleconfig/crypto
 i=0
 for p in $peers ; do
-        cp -r crypto-config/peerOrganizations/hrl.ibm.il/peers/$p.hrl.ibm.il/msp/* $p/sampleconfig/crypto
-        cp -r crypto-config/peerOrganizations/hrl.ibm.il/peers/$p.hrl.ibm.il/tls/* $p/sampleconfig/tls/
-        (( i += 1 ))
+    cp -r crypto-config/peerOrganizations/hrl.ibm.il/peers/$p.hrl.ibm.il/msp/* $p/sampleconfig/crypto
+    cp -r crypto-config/peerOrganizations/hrl.ibm.il/peers/$p.hrl.ibm.il/tls/* $p/sampleconfig/tls/
+    (( i += 1 ))
 done
 
 cp -r crypto-config/ordererOrganizations/hrl.ibm.il/orderers/${orderer}.hrl.ibm.il/tls/* $orderer/sampleconfig/tls
@@ -163,18 +164,18 @@ echo "Deploying configuration"
 
 
 for p in $orderer $peers ; do
-        ssh $user@$p "pkill orderer; pkill peer" || echo ""
-        ssh $user@$p "rm -rf /var/hyperledger/production/*"
-        ssh $user@$p "cd /opt/gopath/src/github.com/hyperledger/fabric ; git reset HEAD --hard && git pull"
-        scp -r $p/sampleconfig/* $user@$p:/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig/
+    ssh $user@$p "pkill orderer; pkill peer" || echo ""
+    ssh $user@$p "rm -rf /var/hyperledger/production/*"
+    ssh $user@$p "cd /opt/gopath/src/github.com/hyperledger/fabric ; git reset HEAD --hard && git pull"
+    scp -r $p/sampleconfig/* $user@$p:/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig/
 done
 
 
 echo "killing docker containers"
 for p in $peers ; do
-        ssh $user@$p "sudo docker ps -aq | xargs docker kill &> /dev/null " || echo -n "."
-        ssh $user@$p "sudo docker ps -aq | xargs docker rm &> /dev/null " || echo -n "."
-        ssh $user@$p "sudo docker images | grep 'dev-' | awk '{print $3}' | xargs docker rmi &> /dev/null " || echo -n "."
+    ssh $user@$p "sudo docker ps -aq | xargs docker kill &> /dev/null " || echo -n "."
+    ssh $user@$p "sudo docker ps -aq | xargs docker rm &> /dev/null " || echo -n "."
+    ssh $user@$p "sudo docker images | grep 'dev-' | awk '{print $3}' | xargs docker rmi &> /dev/null " || echo -n "."
 done
 
 echo "Installing orderer"
@@ -182,13 +183,13 @@ ssh $user@$orderer "bash -c '. ~/.profile; cd /opt/gopath/src/github.com/hyperle
 echo "Installing peers"
 for p in $peers ; do
 	echo "Installing peer $p"
-        ssh $user@$p "bash -c '. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric ; make peer' " 
+    ssh $user@$p "bash -c '. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric ; make peer' "
 done
 
 echo "Starting orderer"
 ssh $user@$orderer " . ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric ;  echo './build/bin/orderer &> orderer.out &' > start.sh; bash start.sh "
 for p in $peers ; do
-        echo "Starting peer $p"
+    echo "Starting peer $p"
 	ssh $user@$p " . ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric ;  echo './build/bin/peer node start &> $p.out &' > start.sh; bash start.sh "
 done
 
@@ -252,14 +253,14 @@ sleep 10
 
 echo "Query chaincode..."
 for p in $peers ; do
-        echo "querying on ${p}"
+    echo "querying on ${p}"
 	query $p
 done
 
 echo "Invoking chaincode..."
 for i in `seq 5`; do
-        echo "invoking on ${bootpeer} : ${i}"
-        invoke ${bootPeer}
+    echo "invoking on ${bootpeer} : ${i}"
+    invoke ${bootPeer}
 done
 
 echo "Waiting for peers $peers to sync..."

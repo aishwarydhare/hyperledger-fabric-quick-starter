@@ -12,9 +12,9 @@ probeFabric() {
 }
 
 deployFabric() {
-        echo $(scp install.sh ${user}@$1:install.sh)
-        scp install.sh ${user}@$1:install.sh
-        ssh ${user}@$1 "bash install.sh"
+    echo $(scp install.sh ${user}@$1:install.sh)
+    scp install.sh ${user}@$1:install.sh
+    ssh ${user}@$1 "bash install.sh"
 }
 
 [[ -z ${GOPATH} ]] && (echo "Environment variable GOPATH isn't set!"; exit 1)
@@ -36,11 +36,11 @@ done
 echo "starting probeFabric: $orderer $peers"
 
 for p in $orderer $peers; do
-        echo "checking for $p"
-        if [ `probeFabric $p` == "1" ];then
-                echo "Didn't detect fabric installation on $p, proceeding to install fabric on it"
-                deployFabric $p
-        fi
+    echo "checking for $p"
+    if [ `probeFabric $p` == "1" ];then
+            echo "Didn't detect fabric installation on $p, proceeding to install fabric on it"
+            deployFabric $p
+    fi
 done
 
 echo "Passed probeFabric in nodes"
