@@ -1,8 +1,4 @@
 var fs = require('fs');
-var shell = require('shelljs');
-
-let cryptoConfigData = require("../crypto-config");
-let configTxData = require("../configtx");
 
 async function generateCryptoConfigFile(data) {
   return new Promise((resolve, reject) => {
@@ -200,165 +196,135 @@ async function generateConfigTxFile(data) {
   });
 }
 
-async function sortArtifactsByNodes(data){
-  return new Promise(async (resolve, reject) => {
-    for (let i = 0; i < data.organisations.length; i++) {
-      let domain = data.organisations[i].Domain;
-      let type = data.organisations[i].Type === 0 ? "orderer" : "peer";
-      for (let j = 0; j < data.organisations[i].Hostname.length; j++) {
-        let addr = data.organisations[i].Hostname[j];
-        console.log(addr, domain, type);
-        // msp
-        let src = `../output/crypto-config/${type}Organizations/${domain}/${type}s/${addr}.${domain}/msp/*`;
-        let dest = `../output/toDeploy/${addr}/sampleconfig/crypto`;
-        await shell.exec(`mkdir -p ${dest}`);
-
-        // tls
-        src = `../output/crypto-config/${type}Organizations/${domain}/${type}s/${addr}.${domain}/tls/*`;
-        dest = `../output/toDeploy/${addr}/sampleconfig/tls/`;
-        await shell.exec(`mkdir -p ${dest}`);
-        await shell.cp("-R", src, dest);
-      }
-    }
-    return resolve(true);
-  });
-}
-
-async function uploadOnRemote(data){
-  return new Promise(async (resolve, reject) => {
+async function generateOrdererFile(data){
+  return new Promise((resolve, reject) => {
+    let ordererOrg = "";
     for (let i = 0; i < data.organisations.length; i++) {
       for (let j = 0; j < data.organisations[i].Hostname.length; j++) {
-        let remoteUser = "ubuntu";
-        let remoteAddr = data.organisations[i].Hostname[j];
-        let srcPath = `../output/toDeploy/${remoteAddr}/sampleconfig/*`;
-        let remotePath = `/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig/`;
-        await shell.exec(`scp -r ${srcPath} ${remoteUser}@${remoteAddr}:${remotePath}`);
-        console.log(`Successfully pushed ${srcPath} on remote`);
+        if (data.organisations[i].Type === 0) {
+          ordererOrg = data.organisations[i].Name;
+          break;
+        }
       }
     }
+    let cc = `
+General:
+    LedgerType: file
+    ListenAddress: 0.0.0.0
+    ListenPort: 7050
+    TLS:
+        Enabled: true
+        PrivateKey: tls/server.key
+        Certificate: tls/server.crt
+        RootCAs:
+          - tls/ca.crt
+        ClientAuthRequired: false
+        ClientRootCAs:
+    Keepalive:
+        ServerMinInterval: 60s
+        ServerInterval: 7200s
+        ServerTimeout: 20s
+    Cluster:
+        SendBufferSize: 10
+        ClientCertificate:
+        ClientPrivateKey:
+        ListenPort:
+        ListenAddress:
+        ServerCertificate:
+        ServerPrivateKey:
+    GenesisMethod: file
+    GenesisProfile: Genesis
+    GenesisFile: genesis.block
+    LocalMSPDir: crypto
+    LocalMSPID: ${ordererOrg}
+    Profile:
+        Enabled: false
+        Address: 0.0.0.0:6060
+    BCCSP:
+        Default: SW
+        SW:
+            Hash: SHA2
+            Security: 256
+            FileKeyStore:
+                KeyStore:
+    Authentication:
+        TimeWindow: 15m
 
-    return resolve(true);
+FileLedger:
+    Location: /var/hyperledger/production/orderer
+    Prefix: hyperledger-fabric-ordererledger
+
+RAMLedger:
+    HistorySize: 1000
+
+Kafka:
+    Retry:
+        ShortInterval: 5s
+        ShortTotal: 10m
+        LongInterval: 5m
+        LongTotal: 12h
+        NetworkTimeouts:
+            DialTimeout: 10s
+            ReadTimeout: 10s
+            WriteTimeout: 10s
+        Metadata:
+            RetryBackoff: 250ms
+            RetryMax: 3
+        Producer:
+            RetryBackoff: 100ms
+            RetryMax: 3
+        Consumer:
+            RetryBackoff: 2s
+    Topic:
+        ReplicationFactor: 3
+    Verbose: false
+    TLS:
+      Enabled: false
+      PrivateKey:
+      Certificate:
+      RootCAs:
+    SASLPlain:
+      Enabled: false
+      User:
+      Password:
+    Version:
+
+Debug:
+    BroadcastTraceDir:
+    DeliverTraceDir:
+
+Operations:
+    ListenAddress: 127.0.0.1:8443
+    TLS:
+        Enabled: false
+        Certificate:
+        PrivateKey:
+        ClientAuthRequired: false
+        ClientRootCAs: []
+
+Metrics:
+    Provider: disabled
+    Statsd:
+      Network: udp
+      Address: 127.0.0.1:8125
+      WriteInterval: 30s
+      Prefix:
+
+Consensus:
+    WALDir: /var/hyperledger/production/orderer/etcdraft/wal
+    SnapDir: /var/hyperledger/production/orderer/etcdraft/snapshot
+`;
+
+    fs.writeFile('../output/orderer.yaml', cc, async function (err){
+      if(err) return reject(err);
+      return resolve();
+    });
   });
+
 }
 
-async function installOrderersAndPeers(data){
-  return new Promise(async (resolve, reject) => {
-    for (let i = 0; i < data.organisations.length; i++) {
-      for (let j = 0; j < data.organisations[i].Hostname.length; j++) {
-        let remoteUser = "ubuntu";
-        let remoteAddr = data.organisations[i].Hostname[j];
-        let type = data.organisations[i].Type === 0 ? "orderer" : "peer";
-
-        let cmd = "";
-        if(data.organisations[i].Type === 0){
-          cmd = "bash -c '. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric ; make orderer && make peer'";
-        } else if(data.organisations[i].Type === 1){
-          cmd = "bash -c '. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric ; make peer' ";
-        }
-        cmd = `ssh ${remoteUser}@${remoteAddr} \"${cmd}\"`;
-        // console.log("cmd", cmd);
-        await shell.exec(cmd);
-        console.log(`Successfully installed ${type} on ${remoteAddr} remote`);
-      }
-    }
-    return resolve(true);
-  });
-}
-
-async function startOrderersAndPeers(data){
-  return new Promise(async (resolve, reject) => {
-    for (let i = 0; i < data.organisations.length; i++) {
-      for (let j = 0; j < data.organisations[i].Hostname.length; j++) {
-        let remoteUser = "ubuntu";
-        let remoteAddr = data.organisations[i].Hostname[j];
-        let type = data.organisations[i].Type === 0 ? "orderer" : "peer";
-
-        let cmd = "";
-        if(data.organisations[i].Type === 0){
-          cmd = `. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric; echo './build/bin/orderer &> orderer.out &' > start.sh; bash start.sh`;
-        } else if(data.organisations[i].Type === 1){
-          cmd = `. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric; echo './build/bin/peer node start &> ${remoteAddr}.out &' > start.sh; bash start.sh`;
-        }
-        cmd = `ssh ${remoteUser}@${remoteAddr} \"${cmd}\"`;
-        // console.log("cmd", cmd);
-        await shell.exec(cmd);
-        console.log(`Successfully started ${type} on ${remoteAddr} remote`);
-      }
-    }
-
-    let timer = setInterval(async ()=>{
-      let allOnline = false;
-      do {
-        allOnline = true;
-        for (let i = 0; i < data.organisations.length; i++) {
-          for (let j = 0; j < data.organisations[i].Hostname.length; j++) {
-            let remoteUser = "ubuntu";
-            let remoteAddr = data.organisations[i].Hostname[j];
-
-            let cmd1 = "echo \"\" | nc $1 7050 && return 0";
-            let cmd2 = "echo \"\" | nc $1 7051 && return 0";
-            let cmd3 = "return 1";
-
-            let cmd = `ssh ${remoteUser}@${remoteAddr} \"${cmd1}; ${cmd2}; ${cmd3}\"`;
-            console.log("cmd", cmd);
-            if(await shell.exec(cmd).code !== 0){
-              console.log(`${remoteAddr} isn't online yet`);
-              allOnline=false;
-              clearInterval(timer);
-              break;
-            }
-          }
-        }
-        if(allOnline === true){
-          console.log("all nodes are online");
-          return resolve(true);
-        }
-      } while (allOnline === false);
-    }, 5000);
-    setTimeout(()=>{clearInterval(timer)}, 30000);
-  });
-}
-
-async function createOrganisation(cryptoConfigData, configTxData) {
-  await generateCryptoConfigFile(cryptoConfigData).catch((e) => {
-    throw e
-  });
-  console.log("Generated crypto-config.yaml");
-
-  await generateConfigTxFile(configTxData).catch((e) => {
-    throw e
-  });
-  console.log("Generated configtx.yaml");
-
-  if(await shell.exec(`cd ../output && cryptogen generate --config crypto-config.yml`).code === 0 ){
-    console.log("Successfully generated all certs using cryptogen");
-  }
-
-  if(await shell.exec(`cd ../output && configtxgen -profile Genesis -outputBlock genesis.block -channelID system`).code === 0 ){
-    console.log("Successfully signed and created genesis block using configtxgen");
-  }
-
-  for (let i = 0; i < configTxData.Profiles.length; i++) {
-    let profileName = configTxData.Profiles[i].Name;
-    for (let j = 0; j < configTxData.Profiles[i].ChannelNames.length; j++) {
-      let channelName = configTxData.Profiles[i].ChannelNames[j];
-      if (await shell.exec(`cd ../output && configtxgen -profile ${profileName} -outputCreateChannelTx ${channelName}.block -channelID ${channelName}`).code === 0) {
-        console.log(`Successfully signed and created ${channelName} block using configtxgen`);
-      }
-    }
-  }
-
-  await sortArtifactsByNodes(cryptoConfigData);
-  console.log("Successfully sorted artifacts by nodes");
-
-  await uploadOnRemote(cryptoConfigData);
-  console.log("Successfully uploaded artifacts on their nodes");
-
-  await installOrderersAndPeers(cryptoConfigData);
-  console.log("Successfully installed orderer & peers on their nodes");
-
-  await startOrderersAndPeers(cryptoConfigData);
-  console.log("Successfully started orderer & peers on their nodes");
-}
-
-createOrganisation(cryptoConfigData, configTxData);
+module.exports = {
+  generateCryptoConfigFile: generateCryptoConfigFile,
+  generateConfigTxFile: generateConfigTxFile,
+  generateOrdererFile: generateOrdererFile,
+};
