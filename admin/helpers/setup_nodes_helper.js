@@ -30,7 +30,7 @@ async function createOrganisation(cryptoConfigData, configTxData) {
       await generateCoreFiles(address, propagatePeerNum, bootPeer, j).catch((e) => {
         throw e
       });
-      console.log(`Generated core.yaml file for ${address}`);
+      console.log(`Generated core.yml file for ${address}`);
     }
   }
 

@@ -1310,13 +1310,12 @@ metrics:
 
               # prometheus http server listen address for pull metrics
               listenAddress: 0.0.0.0:8080
-
 `;
     let dir = `../output/toDeploy/${address}/sampleconfig`;
     await shell.exec(`mkdir -p ${dir}`);
     fs.writeFile(dir+"/core.yml", cc, async function (err){
       if(err){
-        console.log(`ERR in ${address} core.yaml generation`);
+        console.log(`ERR in ${address} core.yml generation`);
         return reject(err)
       }
       return resolve();
