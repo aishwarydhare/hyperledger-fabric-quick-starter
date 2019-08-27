@@ -11,11 +11,11 @@ probePeerOrOrderer() {
 . config.sh
 
 echo "Starting orderer"
-ssh ${user}@${orderer} " . ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric ;  echo './build/bin/orderer &> orderer.out &' > start.sh; bash start.sh "
+ssh ${user}@${orderer} " . ~/.profile; export FABRIC_CFG_PATH=/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig; cd /opt/gopath/src/github.com/hyperledger/fabric ;  echo 'orderer &> orderer.out &' > start.sh; bash start.sh "
 
 for p in ${peers} ; do
-        echo "Starting peer $p"
-	ssh ${user}@${p} " . ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric ;  echo './build/bin/peer node start &> $p.out &' > start.sh; bash start.sh "
+    echo "Starting peer $p"
+    ssh ${user}@${p} " . ~/.profile; export FABRIC_CFG_PATH=/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig; cd /opt/gopath/src/github.com/hyperledger/fabric ;  echo 'peer node start &> $p.out &' > start.sh; bash start.sh "
 done
 
 echo "waiting for orderer and peers to be online"

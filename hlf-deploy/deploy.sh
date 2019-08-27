@@ -88,14 +88,14 @@ for p in $orderer $peers ; do
                 orgLeader=true
         fi
         (( i += 1 ))
-        cat ../template/core.yaml.template | sed "s/PROPAGATEPEERNUM/${PROPAGATEPEERNUM}/ ; s/PEERID/$p/ ; s/ADDRESS/$p/ ; s/ORGLEADER/$orgLeader/ ; s/BOOTSTRAP/$bootPeer:7051/ ; s/TLS_CERT/$p.hrl.ibm.il-cert.pem/" > $p/sampleconfig/core.yaml
+        cat ./template/core.yaml.template | sed "s/PROPAGATEPEERNUM/${PROPAGATEPEERNUM}/ ; s/PEERID/$p/ ; s/ADDRESS/$p/ ; s/ORGLEADER/$orgLeader/ ; s/BOOTSTRAP/$bootPeer:7051/ ; s/TLS_CERT/$p.hrl.ibm.il-cert.pem/" > $p/sampleconfig/core.yaml
 done
 
 echo "orderer $orderer"
 
-cat ../template/configtx.yaml.template | sed "s/ANCHOR_PEER_IP/anchorpeer/ ; s/ORDERER_IP/$orderer/" > configtx.yaml
+cat ./template/configtx.yaml.template | sed "s/ANCHOR_PEER_IP/anchorpeer/ ; s/ORDERER_IP/$orderer/" > configtx.yaml
 
-cat ../template/crypto-config.yml.template | sed "s/ORDERER_IP/$orderer/" > crypto-config.yml
+cat ./template/crypto-config.yml.template | sed "s/ORDERER_IP/$orderer/" > crypto-config.yml
 for p in $peers ; do
     echo "        - Hostname: $p" >> crypto-config.yml
 done
@@ -147,7 +147,7 @@ export CORE_PEER_TLS_ROOTCERT_FILE=`pwd`/crypto-config/peerOrganizations/hrl.ibm
 export CORE_PEER_TLS_ENABLED=true
 
 mv genesis.block $orderer/sampleconfig/
-cp orderer.yaml $orderer/sampleconfig/
+cp ./template/orderer.yaml $orderer/sampleconfig/
 
 cp -r crypto-config/ordererOrganizations/hrl.ibm.il/orderers/${orderer}.hrl.ibm.il/msp/* $orderer/sampleconfig/crypto
 i=0
