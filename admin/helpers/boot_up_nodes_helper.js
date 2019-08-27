@@ -83,9 +83,13 @@ async function startOrderersAndPeers(data){
 
         let cmd = "";
         if(data.organisations[i].Type === 0){
-          cmd = `. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric; echo './build/bin/orderer &> orderer.out &' > start.sh; bash start.sh`;
+          cmd = `. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric;
+          export FABRIC_CFG_PATH=/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig; 
+          echo 'orderer &> orderer.out &' > start.sh; bash start.sh`;
         } else if(data.organisations[i].Type === 1){
-          cmd = `. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric; echo './build/bin/peer node start &> ${remoteAddr}.out &' > start.sh; bash start.sh`;
+          cmd = `. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric;
+          export FABRIC_CFG_PATH=/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig; 
+          echo 'peer node start &> ${remoteAddr}.out &' > start.sh; bash start.sh`;
         }
         cmd = `ssh ${remoteUser}@${remoteAddr} \"${cmd}\"`;
         // console.log("cmd", cmd);
