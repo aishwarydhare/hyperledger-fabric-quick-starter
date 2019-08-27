@@ -29,7 +29,7 @@ while :; do
 		fi
 	done
 	if [ "${allOnline}" == "true" ];then
-                echo "All online confirmed"
+        echo "All online confirmed"
 		break;
 	fi
 	sleep 5

@@ -255,12 +255,67 @@ async function installOrderersAndPeers(data){
         } else if(data.organisations[i].Type === 1){
           cmd = "bash -c '. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric ; make peer' ";
         }
-
-        await shell.exec(`ssh ${remoteUser}@${remoteAddr} ${cmd}`);
+        cmd = `ssh ${remoteUser}@${remoteAddr} \"${cmd}\"`;
+        // console.log("cmd", cmd);
+        await shell.exec(cmd);
         console.log(`Successfully installed ${type} on ${remoteAddr} remote`);
       }
     }
     return resolve(true);
+  });
+}
+
+async function startOrderersAndPeers(data){
+  return new Promise(async (resolve, reject) => {
+    for (let i = 0; i < data.organisations.length; i++) {
+      for (let j = 0; j < data.organisations[i].Hostname.length; j++) {
+        let remoteUser = "ubuntu";
+        let remoteAddr = data.organisations[i].Hostname[j];
+        let type = data.organisations[i].Type === 0 ? "orderer" : "peer";
+
+        let cmd = "";
+        if(data.organisations[i].Type === 0){
+          cmd = `. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric; echo './build/bin/orderer &> orderer.out &' > start.sh; bash start.sh`;
+        } else if(data.organisations[i].Type === 1){
+          cmd = `. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric; echo './build/bin/peer node start &> ${remoteAddr}.out &' > start.sh; bash start.sh`;
+        }
+        cmd = `ssh ${remoteUser}@${remoteAddr} \"${cmd}\"`;
+        // console.log("cmd", cmd);
+        await shell.exec(cmd);
+        console.log(`Successfully started ${type} on ${remoteAddr} remote`);
+      }
+    }
+
+    let timer = setInterval(async ()=>{
+      let allOnline = false;
+      do {
+        allOnline = true;
+        for (let i = 0; i < data.organisations.length; i++) {
+          for (let j = 0; j < data.organisations[i].Hostname.length; j++) {
+            let remoteUser = "ubuntu";
+            let remoteAddr = data.organisations[i].Hostname[j];
+
+            let cmd1 = "echo \"\" | nc $1 7050 && return 0";
+            let cmd2 = "echo \"\" | nc $1 7051 && return 0";
+            let cmd3 = "return 1";
+
+            let cmd = `ssh ${remoteUser}@${remoteAddr} \"${cmd1}; ${cmd2}; ${cmd3}\"`;
+            console.log("cmd", cmd);
+            if(await shell.exec(cmd).code !== 0){
+              console.log(`${remoteAddr} isn't online yet`);
+              allOnline=false;
+              clearInterval(timer);
+              break;
+            }
+          }
+        }
+        if(allOnline === true){
+          console.log("all nodes are online");
+          return resolve(true);
+        }
+      } while (allOnline === false);
+    }, 5000);
+    setTimeout(()=>{clearInterval(timer)}, 30000);
   });
 }
 
@@ -301,6 +356,9 @@ async function createOrganisation(cryptoConfigData, configTxData) {
 
   await installOrderersAndPeers(cryptoConfigData);
   console.log("Successfully installed orderer & peers on their nodes");
+
+  await startOrderersAndPeers(cryptoConfigData);
+  console.log("Successfully started orderer & peers on their nodes");
 }
 
 createOrganisation(cryptoConfigData, configTxData);
