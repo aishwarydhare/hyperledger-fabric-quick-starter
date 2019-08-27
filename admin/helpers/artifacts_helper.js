@@ -237,7 +237,30 @@ async function uploadOnRemote(data){
       }
     }
 
-    return resolve();
+    return resolve(true);
+  });
+}
+
+async function installOrderersAndPeers(data){
+  return new Promise(async (resolve, reject) => {
+    for (let i = 0; i < data.organisations.length; i++) {
+      for (let j = 0; j < data.organisations[i].Hostname.length; j++) {
+        let remoteUser = "ubuntu";
+        let remoteAddr = data.organisations[i].Hostname[j];
+        let type = data.organisations[i].Type === 0 ? "orderer" : "peer";
+
+        let cmd = "";
+        if(data.organisations[i].Type === 0){
+          cmd = "bash -c '. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric ; make orderer && make peer'";
+        } else if(data.organisations[i].Type === 1){
+          cmd = "bash -c '. ~/.profile; cd /opt/gopath/src/github.com/hyperledger/fabric ; make peer' ";
+        }
+
+        await shell.exec(`ssh ${remoteUser}@${remoteAddr} ${cmd}`);
+        console.log(`Successfully installed ${type} on ${remoteAddr} remote`);
+      }
+    }
+    return resolve(true);
   });
 }
 
@@ -270,14 +293,14 @@ async function createOrganisation(cryptoConfigData, configTxData) {
     }
   }
 
-  if(await sortArtifactsByNodes(cryptoConfigData) === true){
-    console.log("Successfully sorted artifacts by nodes");
-  }
+  await sortArtifactsByNodes(cryptoConfigData);
+  console.log("Successfully sorted artifacts by nodes");
 
-  if(await uploadOnRemote(cryptoConfigData) === true){
+  await uploadOnRemote(cryptoConfigData);
+  console.log("Successfully uploaded artifacts on their nodes");
 
-  }
-
+  await installOrderersAndPeers(cryptoConfigData);
+  console.log("Successfully installed orderer & peers on their nodes");
 }
 
 createOrganisation(cryptoConfigData, configTxData);
