@@ -17,8 +17,9 @@ async function sortArtifactsByNodes(data){
 
         // msp
         let src = `../output/crypto-config/${type}Organizations/${domain}/${type}s/${addr}.${domain}/msp/*`;
-        let dest = `../output/toDeploy/${addr}/sampleconfig/crypto`;
+        let dest = `../output/toDeploy/${addr}/sampleconfig/crypto/`;
         await shell.exec(`mkdir -p ${dest}`);
+        await shell.cp("-R", src, dest);
 
         // tls
         src = `../output/crypto-config/${type}Organizations/${domain}/${type}s/${addr}.${domain}/tls/*`;

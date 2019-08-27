@@ -1,7 +1,7 @@
 var shell = require('shelljs');
 
-var {generateCryptoConfigFile ,generateConfigTxFile, generateOrdererFile} = require('./prepare_config_files_helper');
-var {sortArtifactsByNodes, uploadOnRemote, installOrderersAndPeers, startOrderersAndPeers} = require('./boot_up_nodes_helper');
+var {generateCryptoConfigFile ,generateConfigTxFile, generateOrdererFile} = require("./prepare_config_files_helper");
+var {sortArtifactsByNodes, uploadOnRemote, installOrderersAndPeers, startOrderersAndPeers} = require("./boot_up_nodes_helper");
 
 let cryptoConfigData = require("../crypto-config");
 let configTxData = require("../configtx");
