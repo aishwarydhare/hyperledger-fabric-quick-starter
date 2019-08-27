@@ -594,28 +594,18 @@ Consensus:
 
 }
 
-async function generateCoreFiles(data){
+async function generateCoreFiles(address, propagatePeerNum, bootPeer, num){
   return new Promise(async (resolve, reject) => {
-    let peerId = "";
-    let address = "";
-    let bootstrap = "";
-    let orgLeader = "";
-    let propagatePeerNum = "";
+    let peerId = address;
+    let bootstrap = bootPeer + ":7051";
+    let orgLeader = false;
+    if(propagatePeerNum > 1){
+      orgLeader = num === 1;
+    } else {
+      orgLeader = true;
+    }
 
-    for (let i = 0; i < data.organisations.length; i++) {
-      for (let j = 0; j < data.organisations[i].Hostname.length; j++) {
-
-        peerId = data.organisations[i].Hostname[j];
-        address = peerId;
-        bootstrap = data.organisations[i].Hostname[0] + ":7051";
-        if(data.organisations[i].Hostname.length > 1){
-          orgLeader = i === 1;
-        } else {
-          orgLeader = true;
-        }
-        propagatePeerNum = data.organisations[i].Hostname.length;
-
-        let cc = `
+    let cc = `
 # Copyright IBM Corp. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -1322,20 +1312,16 @@ metrics:
               listenAddress: 0.0.0.0:8080
 
 `;
-        let dir = `../output/toDeploy/${address}/sampleconfig`;
-        await shell.exec(`mkdir -p ${dir}`);
-        fs.writeFile(dir+"/core.yml", cc, async function (err){
-          if(err){
-            console.log(`ERR in ${address} core.yaml generation`);
-            return reject(err)
-          }
-        });
+    let dir = `../output/toDeploy/${address}/sampleconfig`;
+    await shell.exec(`mkdir -p ${dir}`);
+    fs.writeFile(dir+"/core.yml", cc, async function (err){
+      if(err){
+        console.log(`ERR in ${address} core.yaml generation`);
+        return reject(err)
       }
-    }
-
-    return resolve();
+      return resolve();
+    });
   });
-
 }
 
 module.exports = {

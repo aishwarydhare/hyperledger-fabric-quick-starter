@@ -22,10 +22,17 @@ async function createOrganisation(cryptoConfigData, configTxData) {
   });
   console.log("Generated orderer.yaml");
 
-  await generateCoreFiles(cryptoConfigData).catch((e) => {
-    throw e
-  });
-  console.log("Generated core.yaml files for orderer and peers");
+  for (let i = 0; i < cryptoConfigData.organisations.length; i++) {
+    for (let j = 0; j < cryptoConfigData.organisations[i].Hostname.length; j++) {
+      let address = cryptoConfigData.organisations[i].Hostname[j];
+      let bootPeer = cryptoConfigData.organisations[i].Hostname[0] + ":7051";
+      let propagatePeerNum = cryptoConfigData.organisations[i].Hostname.length;
+      await generateCoreFiles(address, propagatePeerNum, bootPeer, j).catch((e) => {
+        throw e
+      });
+      console.log(`Generated core.yaml file for ${address}`);
+    }
+  }
 
   if(await shell.exec(`cd ../output && cryptogen generate --config crypto-config.yml`).code === 0 ){
     console.log("Successfully generated all certs using cryptogen");
