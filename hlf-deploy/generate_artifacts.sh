@@ -22,7 +22,7 @@ export CORE_PEER_TLS_ENABLED=true
 
 echo "Moving generated orderer certs into orderer specific directory"
 mv genesis.block $orderer/sampleconfig/
-cp orderer.yaml $orderer/sampleconfig/
+cp ./template/orderer.yaml $orderer/sampleconfig/
 cp -r crypto-config/ordererOrganizations/${DOMAIN}/orderers/${orderer}.${DOMAIN}/tls/* $orderer/sampleconfig/tls
 
 echo "Moving generated peer certs into peer specific directories"

@@ -1316,7 +1316,7 @@ metrics:
     fs.writeFile(dir+"/core.yml", cc, async function (err){
       if(err){
         console.log(`ERR in ${address} core.yml generation`);
-        return reject(err)
+        return reject(err);
       }
       return resolve();
     });
