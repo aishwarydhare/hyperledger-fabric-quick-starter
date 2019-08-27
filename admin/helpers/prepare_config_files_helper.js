@@ -1,4 +1,5 @@
 var fs = require('fs');
+var shell = require('shelljs');
 
 async function generateCryptoConfigFile(data) {
   return new Promise((resolve, reject) => {
@@ -594,7 +595,7 @@ Consensus:
 }
 
 async function generateCoreFiles(data){
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     let peerId = "";
     let address = "";
     let bootstrap = "";
@@ -1322,7 +1323,7 @@ metrics:
 
 `;
         let dir = `../output/toDeploy/${address}/sampleconfig`;
-        fs.mkdirSync(dir);
+        await shell.exec(`mkdir -p ${dir}`);
         fs.writeFile(dir+"/core.yml", cc, async function (err){
           if(err){
             console.log(`ERR in ${address} core.yaml generation`);
