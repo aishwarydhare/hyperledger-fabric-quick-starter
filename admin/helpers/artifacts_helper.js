@@ -207,24 +207,37 @@ async function sortArtifactsByNodes(data){
       let type = data.organisations[i].Type === 0 ? "orderer" : "peer";
       for (let j = 0; j < data.organisations[i].Hostname.length; j++) {
         let addr = data.organisations[i].Hostname[j];
-        let src = `../output/crypto-config/${type}Organizations/${domain}/peers/${addr}.${domain}/msp/*`;
-        let dest = `../output/toDeploy/${addr}/sampleconfig/crypto/`;
+        console.log(addr, domain, type);
+        // msp
+        let src = `../output/crypto-config/${type}Organizations/${domain}/${type}s/${addr}.${domain}/msp/*`;
+        let dest = `../output/toDeploy/${addr}/sampleconfig/crypto`;
+        await shell.exec(`mkdir -p ${dest}`);
+
+        // tls
+        src = `../output/crypto-config/${type}Organizations/${domain}/${type}s/${addr}.${domain}/tls/*`;
+        dest = `../output/toDeploy/${addr}/sampleconfig/tls/`;
         await shell.exec(`mkdir -p ${dest}`);
         await shell.cp("-R", src, dest);
       }
-      return resolve(true);
     }
+    return resolve(true);
   });
 }
 
-async function uploadOnRemote(remoteUser, remoteAddr, srcPath, remotePath){
+async function uploadOnRemote(data){
   return new Promise(async (resolve, reject) => {
-    if(await shell.exec(`scp -r ${srcPath} ${remoteUser}@${remoteAddr}:${remotePath}`).code === 0){
-      console.log(`Successfully pushed ${srcPath} on remote`);
-      return resolve();
-    } else {
-      return reject();
+    for (let i = 0; i < data.organisations.length; i++) {
+      for (let j = 0; j < data.organisations[i].Hostname.length; j++) {
+        let remoteUser = "ubuntu";
+        let remoteAddr = data.organisations[i].Hostname[j];
+        let srcPath = `../output/toDeploy/${remoteAddr}/sampleconfig/*`;
+        let remotePath = `/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig/`;
+        await shell.exec(`scp -r ${srcPath} ${remoteUser}@${remoteAddr}:${remotePath}`);
+        console.log(`Successfully pushed ${srcPath} on remote`);
+      }
     }
+
+    return resolve();
   });
 }
 
@@ -261,12 +274,9 @@ async function createOrganisation(cryptoConfigData, configTxData) {
     console.log("Successfully sorted artifacts by nodes");
   }
 
-  return;
+  if(await uploadOnRemote(cryptoConfigData) === true){
 
-  await uploadOnRemote('ubuntu',
-    '',
-    '',
-    '/opt/gopath/src/github.com/hyperledger/fabric/sampleconfig/');
+  }
 
 }
 
