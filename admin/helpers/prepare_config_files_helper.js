@@ -609,9 +609,9 @@ async function generateCoreFiles(data){
         address = peerId;
         bootstrap = data.organisations[i].Hostname[0] + ":7051";
         if(data.organisations[i].Hostname.length > 1){
-          orgLeader = data.organisations[i].Hostname[1];
+          orgLeader = i === 1;
         } else {
-          orgLeader = data.organisations[i].Hostname[0];
+          orgLeader = true;
         }
         propagatePeerNum = data.organisations[i].Hostname.length;
 
