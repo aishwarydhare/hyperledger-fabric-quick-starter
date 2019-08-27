@@ -593,7 +593,7 @@ Consensus:
 
 }
 
-async function generateCoreFile(data, outputPath){
+async function generateCoreFiles(data){
   return new Promise((resolve, reject) => {
     let peerId = "";
     let address = "";
@@ -1341,4 +1341,5 @@ module.exports = {
   generateCryptoConfigFile: generateCryptoConfigFile,
   generateConfigTxFile: generateConfigTxFile,
   generateOrdererFile: generateOrdererFile,
+  generateCoreFiles: generateCoreFiles
 };

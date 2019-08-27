@@ -1,6 +1,6 @@
 var shell = require('shelljs');
 
-var {generateCryptoConfigFile ,generateConfigTxFile, generateOrdererFile} = require("./prepare_config_files_helper");
+var {generateCryptoConfigFile ,generateConfigTxFile, generateOrdererFile, generateCoreFiles} = require("./prepare_config_files_helper");
 var {sortArtifactsByNodes, uploadOnRemote, installOrderersAndPeers, startOrderersAndPeers} = require("./boot_up_nodes_helper");
 
 let cryptoConfigData = require("../crypto-config");
@@ -21,6 +21,11 @@ async function createOrganisation(cryptoConfigData, configTxData) {
     throw e
   });
   console.log("Generated orderer.yaml");
+
+  await generateCoreFiles(cryptoConfigData).catch((e) => {
+    throw e
+  });
+  console.log("Generated core.yaml files for orderer and peers");
 
   if(await shell.exec(`cd ../output && cryptogen generate --config crypto-config.yml`).code === 0 ){
     console.log("Successfully generated all certs using cryptogen");
